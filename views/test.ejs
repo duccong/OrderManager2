@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css"  href="/css/style.css">
+    <title>Document</title>
+    <!-- <style>
+        .content1 {
+          color: maroon;
+          margin-left: 40px;
+        }
+    </style> -->
+</head>
+<body onload="myFunction()">
+    <div class="content1"> 
+    TESTI1NG...
+    </div>
+    <div>
+        <button id="submit" type="button" onclick=submitOrder()> ABC </button>
+    </div>
+    <div id="ID1"> 
+    ID...
+    </div>
+    <div id="restaurant-item" style="width: auto; height: auto; max-width: 558px; position: relative;">
+        <%- data %>
+    </div>
+
+
+
+
+
+    <!-- TODO: find another way to POST data-->
+    <form id="submitForm" action="/finish" method="POST" style="opacity: 0"> 
+        <input id="listMenu" type="text" name="listMenu">   
+        <input id="userId" type="text" name="userId" value="ttest"> 
+    </form>
+
+    <script>
+        var totalMeal = 0;
+        function myFunction() {
+            // alert("Page is loaded");
+            let Id1 = document.getElementById("ID1");//.style.color = "red";
+            document.getElementById("ID1").style.color = "red";
+            // add input for meals
+            elemMenu  = document.querySelectorAll('.item-restaurant-row');
+            totalMeal = elemMenu.length;
+            let btnSubmit = document.getElementById("submit");
+            // btnSubmit.innerHTML = totalMeal;
+
+            for (const [i, value] of elemMenu.entries()) {
+                let sIn = value.innerHTML;
+                sIn = sIn.slice(0, -6) + `<input id="input-${value.id}" class="input-${i}" style="position: relative; top: 5px; width: 25px; height: 25px" value="0"> </input>` + sIn.slice(-6);
+                // sIn = sIn.replace('+', '-');
+                value.innerHTML = sIn;
+            }
+            // add sub btn
+            elemMenu  = document.querySelectorAll('div.col-auto.adding-food-cart.txt-right');
+            for (const [i, value] of elemMenu.entries()) {
+                let sIn = value.innerHTML;
+                sIn = sIn.slice(0, 5) + "style=\"background-color:green\"" + sIn.slice(5);
+                sIn = sIn.replace('+', '-');
+                value.innerHTML += (sIn);
+            }
+            // add click for btn + -
+            elemMenu  = document.querySelectorAll('div.btn-adding');
+            for (const [i, value] of elemMenu.entries()) {
+                elemMenu[i].onclick = function(event) {
+                    let input0 = document.getElementsByClassName(`input-${Math.floor(i/2)}`);
+                    let inputId = input0.item(0).id;//.slice(6);
+                    // Sale item will have 2 rows
+                    // let inputList = document.querySelectorAll(`#${inputId}`);
+                    let inputList = document.querySelectorAll(`#${CSS.escape(inputId)}`);
+                    console.log(`!${i}, ${input0}`, ` - ${inputList.length} - >>`, inputId);
+                    for (v of inputList) {
+                        if (value.innerHTML == '+') v.value = +parseInt(v.value) + 1;
+                        else  v.value = parseInt(v.value) - 1 <= 0 ? 0 : parseInt(v.value) - 1;
+                    }
+                };
+            }
+        };
+
+        function submitOrder() {
+            console.log('Hello world!' + totalMeal);
+            let order = new Map();
+            let totalPay = 0;
+            // get all input
+            for (let i = 0; i < totalMeal; i++) {
+                let input0 = document.getElementsByClassName(`input-${i}`);
+                if (input0.length > 0) {
+                    let inputId = input0.item(0).id;//.slice(6);
+                    // name:
+                    // currentMoney: (\d+\,\d+)(?!.*\d)
+                    // filter arraay of number !?\d+
+                    let arr = Array.from(inputId.matchAll('(!?\\d+)'));
+                    // console.log(arrNum);
+                    let name, oldPrice, newPrice;
+                    if (arr.length >= 4) {
+                      name = inputId.slice(0, inputId.lastIndexOf(arr[arr.length - 4][0]));
+                      oldPrice = arr[arr.length - 4][0] * 1000;
+                      newPrice = arr[arr.length - 2][0] * 1000;
+                    } else if (arr.length >= 2) {
+                      name = inputId.slice(0, inputId.lastIndexOf(arr[arr.length - 2][0]));
+                      newPrice = arr[arr.length - 2][0] * 1000;
+                    }
+                    let value = input0.item(0).value;//.slice(6);
+                    if (value > 0) {
+                        if (!order.has(name.slice(6))) {
+                            order.set(name.slice(6),
+                             ` => ${(newPrice.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3)}đ x ${value}`);
+                            totalPay += ((+newPrice) * value);
+                        }
+                    }
+                }
+            }
+
+            let listMenu = '';
+            totalPay = (totalPay.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + "đ";
+            for(const [k, v] of order.entries()) {
+                let line = '' + k + ('  ' + v).slice(0, 20) + '\n';
+                listMenu += line;
+            }
+            listMenu += `Total: ${totalPay}`;
+            let user = prompt(`${listMenu} \n Please enter your account to confirm`, "user.lge");
+            if (user) {
+                console.log(`DONE... ${user} confirmed! \n` + listMenu);
+                listMenu.replace('\n', '\\n');
+                let bodyData = document.getElementById("listMenu");
+                bodyData.value = listMenu;
+                let userId = document.getElementById("userId");
+                userId.value = user;
+                let form = document.getElementById("submitForm");
+                form.submit()
+            }
+
+        }
+    </script>
+</body>
+</html>

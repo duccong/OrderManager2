@@ -1,0 +1,14 @@
+.content1 {
+    color: red;
+    background-color: green
+}
+
+.btn-adding {
+    font-size: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 20px;
+    width: 22px;
+    height: 22px;
+    background-color: #ee4d2d;
+  }
