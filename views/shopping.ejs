@@ -13,35 +13,26 @@
     </style> -->
 </head>
 <body onload="myFunction()">
-    <div class="content1"> 
-    TESTI1NG...
+    <div class="h1" style="background-color:lightgray"> 
+        Room: <%- userId %> (<%- link %>)
     </div>
     <div>
-        <button id="submit" type="button" onclick=submitOrder()> ABC </button>
+        <button id="submit" class="btn-success" type="button" onclick=submitOrder() style="width: 75px; height: 50px"> Chốt đơn </button>
     </div>
-    <div id="ID1"> 
-    ID...
+    <div id="ID1" style="padding: 20px;"> =========
     </div>
     <div id="restaurant-item" style="width: auto; height: auto; max-width: 558px; position: relative;">
-        <%- data %>
+        <%- include(userId) %>
     </div>
 
-
-
-
-
     <!-- TODO: find another way to POST data-->
-    <form id="submitForm" action="/finish" method="POST" style="opacity: 0"> 
+    <form id="submitForm" action="/ordered" method="POST" style="opacity: 0"> 
         <input id="listMenu" type="text" name="listMenu">   
-        <input id="userId" type="text" name="userId" value="ttest"> 
     </form>
 
     <script>
         var totalMeal = 0;
         function myFunction() {
-            // alert("Page is loaded");
-            let Id1 = document.getElementById("ID1");//.style.color = "red";
-            document.getElementById("ID1").style.color = "red";
             // add input for meals
             elemMenu  = document.querySelectorAll('.item-restaurant-row');
             totalMeal = elemMenu.length;
@@ -114,23 +105,23 @@
                 }
             }
 
-            let listMenu = '';
-            totalPay = (totalPay.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + "đ";
+            let bill = '';
+            let objBill = {};
             for(const [k, v] of order.entries()) {
                 let line = '' + k + ('  ' + v).slice(0, 20) + '\n';
-                listMenu += line;
+                bill += line;
+                objBill[k] = v.slice(0, 20);
             }
-            listMenu += `Total: ${totalPay}`;
-            let user = prompt(`${listMenu} \n Please enter your account to confirm`, "user.lge");
+            bill += `Total:` + (totalPay.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ`;
+            let user = prompt(`${bill} \n Please enter your account to confirm`, "user.lge");
             if (user) {
-                console.log(`DONE... ${user} confirmed! \n` + listMenu);
-                listMenu.replace('\n', '\\n');
+                console.log(`DONE... ${user} confirmed! \n` + bill);
+                objBill['totalPay'] = totalPay;
+                objBill['uId'] = user;
                 let bodyData = document.getElementById("listMenu");
-                bodyData.value = listMenu;
-                let userId = document.getElementById("userId");
-                userId.value = user;
+                bodyData.value = JSON.stringify(objBill);
                 let form = document.getElementById("submitForm");
-                form.submit()
+                form.submit();
             }
 
         }

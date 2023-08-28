@@ -18,7 +18,7 @@ async function  getData(url, outId) {
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
 
-    await page.setDefaultTimeout(5000);
+    await page.setDefaultTimeout(15000);
 
     // Navigate the page to a URL
     await page.goto(url, {
@@ -44,11 +44,6 @@ async function  getData(url, outId) {
 
     do {
         let restaurantItem = undefined;
-        // if (testI == 1) {
-        //     restaurantItem = await page.evaluate(() => document.querySelector('#restaurant-item').outerHTML);
-        // } else {
-        //     restaurantItem = await page.evaluate(() => document.querySelector('#restaurant-item > div > div').outerHTML);
-        // }
         // list meals: #restaurant-item > div > div > div.item-restaurant-row
         testI++;
         // let listMeals = await page.$$('#restaurant-item > div > div > div.item-restaurant-row');

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    Hello World
+    <form id= "createShopRoom" method="POST" onsubmit="createShopRoom()">
+        Your ID: <input type="text" name="fId" value="user1.lge" style="width:50%"><br>
+        Yout link <input type="text" name="fLink" value="https://shopeefood.vn/ho-chi-minh/com-ba-ghien-nguyen-van-troi" style="width:50%"><br>
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        function createShopRoom(){
+            let user = document.getElementsByName("fId")[0].value;
+            let link = document.getElementsByName("fLink")[0].value;
+            link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+            var action_src = "/shopping?userId=" + user + "&link=" +link;
+           var your_form = document.getElementById('createShopRoom');
+           console.log('POST to ', action_src);
+           your_form.action = action_src ;
+        }
+    </script>
+</body>
+</html>
