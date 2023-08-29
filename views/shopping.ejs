@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css"  href="/css/style.css">
     <title>Document</title>
-    <!-- <style>
-        .content1 {
-          color: maroon;
-          margin-left: 40px;
-        }
-    </style> -->
 </head>
 <body onload="myFunction()">
     <div class="h1" style="background-color:lightgray"> 
-        Room: <%- userId %> (<%- link %>)
+        Room Id: <%- roomId %> (<%- link %>)
     </div>
     <div>
         <button id="submit" class="btn-success" type="button" onclick=submitOrder() style="width: 75px; height: 50px"> Chốt đơn </button>
@@ -22,12 +16,15 @@
     <div id="ID1" style="padding: 20px;"> =========
     </div>
     <div id="restaurant-item" style="width: auto; height: auto; max-width: 558px; position: relative;">
-        <%- include(userId) %>
+        <%- include(roomId) %>
     </div>
 
     <!-- TODO: find another way to POST data-->
     <form id="submitForm" action="/ordered" method="POST" style="opacity: 0"> 
-        <input id="listMenu" type="text" name="listMenu">   
+        <input id="roomId" type="text" name="roomId" value="<%-roomId%>">
+        <input id="link" type="text" name="link" value="<%-link%>">
+        <input id="listMenu" type="text" name="listMenu">
+        <input id="userId" type="text" name="userId">
     </form>
 
     <script>
@@ -116,10 +113,14 @@
             let user = prompt(`${bill} \n Please enter your account to confirm`, "user.lge");
             if (user) {
                 console.log(`DONE... ${user} confirmed! \n` + bill);
-                objBill['totalPay'] = totalPay;
+                objBill['TotalPay'] = totalPay;
                 objBill['uId'] = user;
-                let bodyData = document.getElementById("listMenu");
-                bodyData.value = JSON.stringify(objBill);
+                // DATA
+                let bodyDataForm = document.getElementById("listMenu");
+                bodyDataForm.value = JSON.stringify(objBill);
+                let userIdForm = document.getElementById("userId");
+                userIdForm.value = user;
+                // SUBMIT
                 let form = document.getElementById("submitForm");
                 form.submit();
             }

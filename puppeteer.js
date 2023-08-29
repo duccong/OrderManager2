@@ -97,20 +97,20 @@ async function  getData(url, outId) {
     }
 
     // console.log(listMenu);
-    fs.writeFile(`${outId}.txt`, listMenu, (err) => {
+    fs.writeFile(`views/${outId}.ejs`, listMenu, (err) => {
         console.log(err)
     });
 
-    try {
-        // Capture screenshot and save it in the current folder:
-        await page.screenshot({ path: `./scrapingbee_homepage.jpg` });
+    // try {
+    //     // Capture screenshot and save it in the current folder:
+    //     await page.screenshot({ path: `./scrapingbee_homepage.jpg` });
 
-    } catch (err) {
-        console.log(`Error: ${err.message}`);
-    } finally {
-        await browser.close();
-        console.log(`Screenshot has been captured successfully`);
-    }
+    // } catch (err) {
+    //     console.log(`Error: ${err.message}`);
+    // } finally {
+    //     await browser.close();
+    //     console.log(`Screenshot has been captured successfully`);
+    // }
     await browser.close();
     return data;
 };
@@ -118,15 +118,3 @@ async function  getData(url, outId) {
 module.exports = {
     getData : getData,
 };
-
-//
-// let id = 'guest';
-// let link = 'https://shopeefood.vn/ho-chi-minh/com-ba-ghien-nguyen-van-troi';
-// let data;
-// // read link and save data
-// try {
-//     data =  getData(link, id);
-// } catch (err) {
-//     console.log('err:', data)
-//     data = err;
-// }

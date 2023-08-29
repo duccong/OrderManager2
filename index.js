@@ -16,27 +16,36 @@ app.get('/',async (req, res) => {
 });
 
 app.get('/shopping', async (req, res) => {
-    let userId = req.query.userId;
+    let roomId = req.query.roomId;
     let link = req.query.link;
-    console.log(`Your ID: ` + userId + ` link: `, link);
+    console.log(`Your ID: ` + roomId + ` link: `, link);
     res.render("shopping", {
-        userId: userId,
+        roomId: roomId,
         link: link,
     });
 });
 
 app.post('/shopping', async (req, res) => {
     console.log(`Your ID: ${req.body.fId} \n Link: ${req.body.fLink}`);
-    let id = 'guest';
-    let link = 'https://shopeefood.vn/ho-chi-minh/com-ba-ghien-nguyen-van-troi';
+    let id = req.body.fId;
+    let link = req.body.fLink;
     let data;
     // read link and save data
-    // try {
-    //     data = await myUtils.getData(link, id);
-    // } catch (err) {
-    //     console.log('ERR: Gettinng data from link: ', data)
-    //     data = err;
-    // }
+    // if (!isFileExist(`views/${id}.ejs`)) {
+    id = id.replace('.', '-');
+    let dataPath = `views/${id}.ejs`;
+    // dataPath = `test1.ejs`;
+    if (!fs.existsSync(dataPath)) {
+        console.log(`Path: views/${dataPath} is not existed`);
+       try {
+           data = await myUtils.getData(link, id);
+        } catch (err) {
+           console.error('ERR: Gettinng data from link: ', data)
+           data = err;
+        }
+    } else {
+        console.log(`Path: ${dataPath} is existed`);
+    }
 
     // fs.readFile(`${id}.txt`, "utf-8", (err, data) => {
     //     console.log('get: ', data.slice(0, 35));
@@ -48,18 +57,20 @@ app.post('/shopping', async (req, res) => {
     res.render("shopping", {
         // data: data,
         link: link,
-        userId: id,
+        roomId: id,
     });
 });
 
 app.post("/ordered", (req, res) => {
-    const { listMenu } = req.body
-    console.log(`Bill: `, listMenu);
+    const { roomId, link, listMenu, userId} = req.body
+    console.log(`Bill: `, listMenu, ' of ', userId, ' from: ', roomId);
+    jListMenu = JSON.parse(listMenu);
     const date = new Date();
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
     let dailyFolder = './daily/' + year + month + day + '/';
+    
     if (!fs.existsSync(dailyFolder)) {
         console.log('Today path is not existed', dailyFolder)
         fs.mkdir(dailyFolder, { recursive: true }, (err) => {
@@ -71,18 +82,33 @@ app.post("/ordered", (req, res) => {
     let sec = addZ(date.getSeconds());
     let min = addZ(date.getMinutes());
     let hours = addZ(date.getHours());
-    // let orderNum = ((`order-${hours}-${min}-${sec}-${milS}-${userId}`).replace(' ', ''));
-    let orderNum = 'TESTING';
-    fs.writeFile(`${dailyFolder+orderNum}.txt`, listMenu, (err) => {
+    let dates = `${hours}h${min}m${sec}s${milS}ms`;
+    jListMenu['Time'] = dates;
+    // let orderNum = roomId;
+    // if (!fs.existsSync(dataPath)) {
+
+    // } else {
+
+    // }
+    let pathRoomFolder = `${dailyFolder}${roomId}`
+    if (!fs.existsSync(pathRoomFolder)) {
+        console.log('Room path is not existed', pathRoomFolder);
+        fs.mkdir(pathRoomFolder, { recursive: true }, (err) => {
+            if (err != null) console.error("error while mkdir: " , err);
+        });
+    }
+    let orderNum = ((`${userId}`).replace(' ', ''));
+    fs.writeFile(`${pathRoomFolder}/${orderNum}.txt`, JSON.stringify(jListMenu), (err) => {
         if (err != null) {
             console.log("ERR: writing file : ", err);
         }
     });
 
-    //
     let data;
-    res.render("index", {
-        userId: `data`
+    res.render("ordered", {
+        roomId: roomId,
+        link: link,
+        yourBills: JSON.stringify(jListMenu)
     })
 })
 
@@ -94,3 +120,11 @@ app.listen(port, (err) => {
 })
 
 function addZ(n){return n<10? '0'+n:''+n;}
+
+async function isFileExist(path) {
+    try {
+        return (await fsp.stat(path)).isFile();
+    } catch (e) {
+        return false;
+    }
+}

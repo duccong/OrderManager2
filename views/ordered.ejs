@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css"  href="/css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    Hello World - Ordered -
+    <form id= "createShopRoom" method="POST" onsubmit="createShopRoom()">
+        Room ID: <input type="text" name="fId" value="<%- roomId %>" style="width:50%" readonly><br>
+        Yout link <input type="text" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
+        <button type="submit" >Continue order</button>
+    </form>
+    <div> 
+        <table id="customers">
+            <tr> 
+                <th> Bill </th>
+                <th> Note </th>
+            </tr>
+            <% for (const [k, v] of Object.entries(JSON.parse(yourBills))) { %>
+            <tr> 
+                <td> <%= k %> </td>
+                <td> <%= (k.toUpperCase() == "TOTALPAY")? (v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ` : v.replace('=>','') %> </td>
+            </tr>
+            <% } %>
+        </table>
+
+    </div>
+
+    <script>
+        function createShopRoom(){
+            let roomId = '<%-roomId %>';//document.getElementsByName("fId")[0].value;
+            let link = '<%=- link %>'; //document.getElementsByName("fLink")[0].value;
+            link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+            var action_src = "/shopping?roomId=" + roomId + "&link=" +link;
+           var your_form = document.getElementById('createShopRoom');
+           console.log('POST to ', action_src);
+           your_form.action = action_src ;
+        }
+    </script>
+</body>
+</html>
