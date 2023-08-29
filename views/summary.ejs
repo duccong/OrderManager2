@@ -7,7 +7,7 @@
     <title>Document</title>
 </head>
 <body>
-    Hello World - Ordered -
+    Hello World - SUMMARY -
     <form id= "createShopRoom" class="h5" method="POST" onsubmit="createShopRoom()">
         Room ID: <br> <input type="text" name="fId" value="<%- roomId %>" style="width:50%" readonly><br>
         Yout link: <br> <input type="search" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
@@ -32,7 +32,7 @@
     <script>
         function createShopRoom(){
             let roomId = '<%-roomId %>';//document.getElementsByName("fId")[0].value;
-            let link = '<%- link %>'; //document.getElementsByName("fLink")[0].value;
+            let link = '<%=- link %>'; //document.getElementsByName("fLink")[0].value;
             link = link.slice(link.indexOf('shopeefood.vn/') + 13);
             var action_src = "/shopping?roomId=" + roomId + "&link=" +link;
            var your_form = document.getElementById('createShopRoom');

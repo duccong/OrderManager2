@@ -7,16 +7,24 @@
     <title>Document</title>
 </head>
 <body onload="myFunction()">
-    <div class="h1" style="background-color:lightgray"> 
-        Room Id: <%- roomId %> (<%- link %>)
+    <div class="h5 item-group" > 
+        Room ID: <br> <input class="input-group" type="text" name="fId" value="<%- roomId %>" style="width:50%" readonly><br>
+        Yout link: <br> <input type="search" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
     </div>
     <div>
-        <button id="submit" class="btn-success" type="button" onclick=submitOrder() style="width: 75px; height: 50px"> Chốt đơn </button>
+        <% if (pageLoadedSuccess) { %>
+            <button id="submit" class="button button1" type="button" onclick=submitOrder() > Chốt đơn </button>
+        <% } %>
     </div>
     <div id="ID1" style="padding: 20px;"> =========
     </div>
     <div id="restaurant-item" style="width: auto; height: auto; max-width: 558px; position: relative;">
-        <%- include(roomId) %>
+        <% if (pageLoadedSuccess) { %>
+        <%- include(roomId); %>
+        <% } else { %> 
+            Fail to load page. Press F5 to re-try.
+            <button onClick="window.location.reload();">Refresh Page</button>
+        <% } %>
     </div>
 
     <!-- TODO: find another way to POST data-->

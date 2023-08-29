@@ -31,31 +31,38 @@ app.post('/shopping', async (req, res) => {
     let link = req.body.fLink;
     let data;
     // read link and save data
-    // if (!isFileExist(`views/${id}.ejs`)) {
-    id = id.replace('.', '-');
+    id = id.replace(/[.:]/g, '-');
     let dataPath = `views/${id}.ejs`;
-    // dataPath = `test1.ejs`;
+    let pageLoadedSuccess = false;
     if (!fs.existsSync(dataPath)) {
         console.log(`Path: views/${dataPath} is not existed`);
        try {
            data = await myUtils.getData(link, id);
+           pageLoadedSuccess = true;
         } catch (err) {
-           console.error('ERR: Gettinng data from link: ', data)
-           data = err;
+            // TODO: need check null ?
+            if (err == null) {
+                pageLoadedSuccess = true
+            } else {
+                console.error('ERR: Gettinng data from link: ', data)
+            }
         }
     } else {
         console.log(`Path: ${dataPath} is existed`);
+        pageLoadedSuccess = true;
     }
 
-    // fs.readFile(`${id}.txt`, "utf-8", (err, data) => {
-    //     console.log('get: ', data.slice(0, 35));
-    //     // render ejs file
-    //     res.render("shopping", {
-    //         data: data,
-    //     })
-    // });
+    if (!pageLoadedSuccess) {
+        console.log(`Fail to load page. Re-try load shoppe page`);
+       try {
+           data = await myUtils.getData(link, id);
+           pageLoadedSuccess = true;
+        } catch (err) {
+           console.error('ERR: Gettinng data from link: ', data)
+        }
+    }
     res.render("shopping", {
-        // data: data,
+        pageLoadedSuccess: pageLoadedSuccess,
         link: link,
         roomId: id,
     });
@@ -71,12 +78,6 @@ app.post("/ordered", (req, res) => {
     let year = date.getFullYear();
     let dailyFolder = './daily/' + year + month + day + '/';
     
-    if (!fs.existsSync(dailyFolder)) {
-        console.log('Today path is not existed', dailyFolder)
-        fs.mkdir(dailyFolder, { recursive: true }, (err) => {
-            console.error("error while writing file: " , err);
-        });
-    }
     // write order
     let milS = date.getMilliseconds();
     let sec = addZ(date.getSeconds());
@@ -85,15 +86,18 @@ app.post("/ordered", (req, res) => {
     let dates = `${hours}h${min}m${sec}s${milS}ms`;
     jListMenu['Time'] = dates;
     // let orderNum = roomId;
-    // if (!fs.existsSync(dataPath)) {
 
-    // } else {
+    if (!fs.existsSync(dailyFolder)) {
+        console.log('Today path is not existed', dailyFolder)
+        fs.mkdirSync(dailyFolder, { recursive: true }, (err) => {
+            console.error("error while writing file: " , err);
+        });
+    }
 
-    // }
-    let pathRoomFolder = `${dailyFolder}${roomId}`
+    let pathRoomFolder = `${dailyFolder}${roomId}/`
     if (!fs.existsSync(pathRoomFolder)) {
         console.log('Room path is not existed', pathRoomFolder);
-        fs.mkdir(pathRoomFolder, { recursive: true }, (err) => {
+        fs.mkdirSync(pathRoomFolder, { recursive: true }, (err) => {
             if (err != null) console.error("error while mkdir: " , err);
         });
     }
@@ -109,6 +113,18 @@ app.post("/ordered", (req, res) => {
         roomId: roomId,
         link: link,
         yourBills: JSON.stringify(jListMenu)
+    })
+})
+
+app.get("/summary", (req, res) => {
+    let roomId = req.query.roomId;
+    let link = req.query.link;
+    let listMenu = {};
+    console.log(`Your ID: ` + roomId + ` link: `, link);
+    res.render("summary", {
+        roomId: roomId,
+        link: link,
+        yourBills: JSON.stringify(listMenu)
     })
 })
 
