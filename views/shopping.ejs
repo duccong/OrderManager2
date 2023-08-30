@@ -14,6 +14,7 @@
     <div>
         <% if (pageLoadedSuccess) { %>
             <button id="submit" class="button button1" type="button" onclick=submitOrder() > Chốt đơn </button>
+            <button id="goSummary" class="button button1" type="button" onclick="location.href='/summary?roomId=<%- roomId%>&link=<%- link %>';" > Tổng đơn </button>
         <% } %>
     </div>
     <div id="ID1" style="padding: 20px;"> =========
@@ -118,7 +119,10 @@
                 objBill[k] = v.slice(0, 20);
             }
             bill += `Total:` + (totalPay.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ`;
-            let user = prompt(`${bill} \n Please enter your account to confirm`, "user.lge");
+            let user = undefined;
+            while (!user || user.length < 1) {
+                user = prompt(`${bill} \n Please enter your account to confirm:`, "");
+            }
             if (user) {
                 console.log(`DONE... ${user} confirmed! \n` + bill);
                 objBill['TotalPay'] = totalPay;
@@ -133,6 +137,19 @@
                 form.submit();
             }
 
+        }
+
+        function goSummary() {
+            // DATA
+            let inputLinkForm = document.getElementsByName("fLink")[0].value;
+            console.log('Hello world!', roomId.value, link.value);
+            // bodyDataForm.value = JSON.stringify(objBill);
+            // let userIdForm = document.getElementById("userId");
+            // userIdForm.value = user;
+            // // SUBMIT
+            let form = document.getElementById("goSummary");
+            form.action('/' + roomId.value + link.value);
+            form.submit();
         }
     </script>
 </body>

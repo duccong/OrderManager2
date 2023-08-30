@@ -19,6 +19,7 @@
             let user = document.getElementsByName("fId")[0].value;
             let link = document.getElementsByName("fLink")[0].value;
             link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+            user = user.replace(/\.|:/gi, "-");
             var action_src = "/shopping?roomId=" + user + "&link=" +link;
            var your_form = document.getElementById('goShop');
            console.log('POST to ', action_src);

@@ -12,6 +12,7 @@
         Room ID: <br> <input type="text" name="fId" value="<%- roomId %>" style="width:50%" readonly><br>
         Yout link: <br> <input type="search" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
         <button type="submit" class="button button1" >Continue order</button>
+        <button id="goSummary" class="button button1" type="button" onclick="location.href='/summary?roomId=<%- roomId%>&link=<%- link %>';" > Tổng đơn </button>
     </form>
     <div> 
         <table id="customers">

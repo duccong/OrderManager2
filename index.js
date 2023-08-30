@@ -37,7 +37,7 @@ app.post('/shopping', async (req, res) => {
     let link = req.body.fLink;
     let data;
     // read link and save data
-    id = id.replace(/[.:]/g, '-');
+    id = id.replaceAll(/[.:]/g, '-');
     let linkId = link.slice(link.lastIndexOf("/") + 1);
     let cacheFileName = `${id + "-" + linkId}`;
     let dataPath = `views/${cacheFileName}.ejs`;
@@ -195,6 +195,11 @@ app.get("/summary", (req, res) => {
     }
     console.log(">", finalBill); 
 
+    // SORTING
+    finalBill = new Map([...finalBill.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+    listUserOrder = new Map([...listUserOrder.entries()].sort((a, b) => a[1].localeCompare(b[1])));
+    listDetailOrder = new Map([...listDetailOrder.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+    // let test3 = test2.at[1];
 
     res.render("summary", {
         roomId: roomId,
