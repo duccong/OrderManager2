@@ -18,7 +18,7 @@ async function  getData(url, outId) {
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
 
-    await page.setDefaultTimeout(15000);
+    await page.setDefaultTimeout(30000);
 
     // Navigate the page to a URL
     await page.goto(url, {
@@ -98,7 +98,7 @@ async function  getData(url, outId) {
 
     // console.log(listMenu);
     fs.writeFile(`views/${outId}.ejs`, listMenu, (err) => {
-        console.log(err)
+        console.log("ERR: writing fie: ", err)
     });
 
     // try {
@@ -112,7 +112,7 @@ async function  getData(url, outId) {
     //     console.log(`Screenshot has been captured successfully`);
     // }
     await browser.close();
-    return data;
+    return listMenu;
 };
 // getData();
 module.exports = {

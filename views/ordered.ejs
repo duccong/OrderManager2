@@ -31,9 +31,9 @@
 
     <script>
         function createShopRoom(){
-            let roomId = '<%-roomId %>';//document.getElementsByName("fId")[0].value;
-            let link = '<%- link %>'; //document.getElementsByName("fLink")[0].value;
-            link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+            let roomId = document.getElementsByName("fId")[0].value;
+            let link = document.getElementsByName("fLink")[0].value;
+            // link = link.slice(link.lastIndexOf('/') + 1);
             var action_src = "/shopping?roomId=" + roomId + "&link=" +link;
            var your_form = document.getElementById('createShopRoom');
            console.log('POST to ', action_src);

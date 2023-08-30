@@ -18,7 +18,7 @@
             <tr> 
                 <th> Bill </th>
                 <th> Note </th>
-            </tr>
+        </tr>
             <% for (const [k, v] of Object.entries(JSON.parse(yourBills))) { %>
             <tr> 
                 <td> <%= k %> </td>
@@ -26,7 +26,36 @@
             </tr>
             <% } %>
         </table>
+    </div>
 
+    <div> 
+        <table id="customers">
+            <tr> 
+                <th> User </th>
+                <th> Time stamp </th>
+        </tr>
+            <% for (const [k, v] of Object.entries(JSON.parse(listUserOrder))) { %>
+            <tr> 
+                <td> <%= k %> </td>
+                <td> <%= (k.toUpperCase() == "TOTALPAY")? (v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ` : v.replace('=>','') %> </td>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+
+    <div> 
+        <table id="customers">
+            <tr> 
+                <th> User </th>
+                <th> Note </th>
+        </tr>
+            <% for (const [k, v] of Object.entries(JSON.parse(listDetailOrder))) { %>
+            <tr> 
+                <td> <%= k %> </td>
+                <td> <%- (k.toUpperCase() == "TOTALPAY")? (v.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ` : v.replace('=>','') %> </td>
+            </tr>
+            <% } %>
+        </table>
     </div>
 
     <script>

@@ -9,7 +9,7 @@
 <body onload="myFunction()">
     <div class="h5 item-group" > 
         Room ID: <br> <input class="input-group" type="text" name="fId" value="<%- roomId %>" style="width:50%" readonly><br>
-        Yout link: <br> <input type="search" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
+        Your link: <br> <input type="search" name="fLink" value="<%- link %>" style="width:50%" readonly><br>
     </div>
     <div>
         <% if (pageLoadedSuccess) { %>
@@ -20,7 +20,7 @@
     </div>
     <div id="restaurant-item" style="width: auto; height: auto; max-width: 558px; position: relative;">
         <% if (pageLoadedSuccess) { %>
-        <%- include(roomId); %>
+        <%- include(loadingPage); %>
         <% } else { %> 
             Fail to load page. Press F5 to re-try.
             <button onClick="window.location.reload();">Refresh Page</button>
@@ -46,7 +46,7 @@
 
             for (const [i, value] of elemMenu.entries()) {
                 let sIn = value.innerHTML;
-                sIn = sIn.slice(0, -6) + `<input id="input-${value.id}" class="input-${i}" style="position: relative; top: 5px; width: 25px; height: 25px" value="0"> </input>` + sIn.slice(-6);
+                sIn = sIn.slice(0, -6) + `<input id="input-${value.id}" class="input-${i}" readonly style="position: relative; top: 5px; width: 25px; height: 25px" value="0"> </input>` + sIn.slice(-6);
                 // sIn = sIn.replace('+', '-');
                 value.innerHTML = sIn;
             }
