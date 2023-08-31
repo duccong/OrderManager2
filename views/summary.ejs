@@ -27,7 +27,7 @@
             <% } %>
         </table>
     </div>
-
+    <% if (Object.keys(JSON.parse(listUserOrder)).length > 0) { %>
     <div> 
         <table id="customers">
             <tr> 
@@ -42,7 +42,8 @@
             <% } %>
         </table>
     </div>
-
+    <% } %>
+    <% if (Object.keys(JSON.parse(listDetailOrder)).length > 0) { %>
     <div> 
         <table id="customers">
             <tr> 
@@ -57,12 +58,14 @@
             <% } %>
         </table>
     </div>
-
+    <% } %>
     <script>
         function createShopRoom(){
             let roomId = '<%-roomId %>';//document.getElementsByName("fId")[0].value;
-            let link = '<%=- link %>'; //document.getElementsByName("fLink")[0].value;
-            link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+            let link = '<%- link %>'; //document.getElementsByName("fLink")[0].value;
+            const regrexAllSpecialCase = /[:;'"?!@#\$%\^\&*\)\(+=._-]/gi;
+            link = link.replace(regrexAllSpecialCase, '-');
+            console.log(`Your ID: ` + roomId + ` link: `, link);
             var action_src = "/shopping?roomId=" + roomId + "&link=" +link;
            var your_form = document.getElementById('createShopRoom');
            console.log('POST to ', action_src);

@@ -13,6 +13,7 @@
     </div>
     <div>
         <% if (pageLoadedSuccess) { %>
+            <button class="button button1" type="button" onclick="window.location.href='/'">Go home</button>
             <button id="submit" class="button button1" type="button" onclick=submitOrder() > Chốt đơn </button>
             <button id="goSummary" class="button button1" type="button" onclick="location.href='/summary?roomId=<%- roomId%>&link=<%- link %>';" > Tổng đơn </button>
         <% } %>
@@ -119,8 +120,8 @@
                 objBill[k] = v.slice(0, 20);
             }
             bill += `Total:` + (totalPay.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')).slice(0, -3) + `đ`;
-            let user = undefined;
-            while (!user || user.length < 1) {
+            let user = '';
+            while (user.length < 1) {
                 user = prompt(`${bill} \n Please enter your account to confirm:`, "");
             }
             if (user) {

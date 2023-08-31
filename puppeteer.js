@@ -18,7 +18,7 @@ async function  getData(url, outId) {
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
 
-    await page.setDefaultTimeout(30000);
+    await page.setDefaultTimeout(120000);
 
     // Navigate the page to a URL
     await page.goto(url, {
@@ -92,7 +92,7 @@ async function  getData(url, outId) {
     console.log('Start make list menu: ');
     let listMenu = '';
     for(const [k, v] of map.entries()) {
-        console.log(v.slice(0, 20));
+        //console.log(v.slice(0, 20));
         listMenu += v;
     }
 

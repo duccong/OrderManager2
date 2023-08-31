@@ -1,27 +1,72 @@
 const myUtils = require('./puppeteer')
 const bodyParser = require('body-parser');
 const express = require('express')
+var path = require('path');
 const app = express()
 const port = 3000
 const fs = require('fs')
 
+const regrexAllSpecialCase = /[:;'"?!@#\$%\^\&*\)\(+=._-]/gi;
+
 app.use(express.static(__dirname + '/public'));
 app.set("view engine", "ejs");
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 app.get('/',async (req, res) => {
+    let pathShowViews = 'views/shopViews/'
+    let files = [];
+
+    if (!fs.existsSync(pathShowViews)) {
+        console.log('No room folder!');
+        fs.mkdirSync(pathShowViews, { recursive: true }, (err) => {
+            console.error("error while writing file: " , err);
+        });
+    }
+
+    const fileList = fs.readdirSync(pathShowViews);
+    console.log("Nums of file: ", fileList.length);
+    // Create the full path of the file/directory by concatenating the passed directory and file/directory name
+    for (const file of fileList) {
+        // const name = `${pathShowViews}/${file}`;
+        files.push(file.slice(0, -4));
+    }
+    let mRoom = new Map();
+    for (const [i, v] of Object.entries(files)) {
+        mRoom.set( +i + 1 , v);
+    }
     res.render("index", {
-        data: "init"
+        data: JSON.stringify(Object.fromEntries(mRoom))
     })
 });
 
 app.get('/shopping', async (req, res) => {
+    let linkShopee = req.query.linkShopee
     let roomId = req.query.roomId;
     let link = req.query.link;
     // TODO: need valid user input
-    let id = roomId.replace(/[.:]/g, '-');
-    let linkId = link.slice(link.lastIndexOf("/") + 1); 
-    let cacheFileName = `${id + "-" + linkId}`;
+    if (linkShopee) {
+        let iLink = linkShopee.indexOf('-linkShopee-');
+        if (iLink >= 0) {
+            roomId = linkShopee.slice(0, iLink);
+            link = linkShopee.slice(iLink + 12);
+        }
+    } 
+
+    if (!roomId || !link) {
+        res.send(`<h1>Something wrong. Not found roomId or link</h1>`);
+        return;
+    }
+    console.log("Shopping: ", roomId, link)
+    let id = roomId.replace(regrexAllSpecialCase, '-');
+    let linkId = link.slice(link.lastIndexOf("/") + 1).replace(regrexAllSpecialCase, '-'); 
+    let cacheFileName = `shopViews/${id + "-linkShopee-" + linkId}`;
+    // TOOD: Need to improve catch all exception?
+    if (!fs.existsSync(`views/${cacheFileName}.ejs`)) {
+        res.send(`<h1>Something wrong. Not found roomId or link ${cacheFileName}</h1>`);
+        return;
+    }
     console.log(`Your ID: ` + roomId + ` link: `, link);
     res.render("shopping", {
         roomId: roomId,
@@ -32,18 +77,22 @@ app.get('/shopping', async (req, res) => {
 });
 
 app.post('/shopping', async (req, res) => {
-    console.log(`Your ID: ${req.body.fId} \n Link: ${req.body.fLink}`);
+    console.log(`SHOPPING >> Your ID: ${req.body.fId} \n Link: ${req.body.fLink}`);
     let id = req.body.fId;
     let link = req.body.fLink;
+    let iLastQuerry = link.lastIndexOf('?');
+    if (iLastQuerry >= 0) {
+        link = link.slice(0, link.lastIndexOf('?'));
+    }
     let data;
     // read link and save data
-    id = id.replaceAll(/[.:]/g, '-');
-    let linkId = link.slice(link.lastIndexOf("/") + 1);
-    let cacheFileName = `${id + "-" + linkId}`;
+    id = id.replaceAll(regrexAllSpecialCase, '-');
+    let linkId = link.slice(link.lastIndexOf("/") + 1).replace(regrexAllSpecialCase, '-');
+    let cacheFileName = `shopViews/${id + "-linkShopee-" + linkId}`;
     let dataPath = `views/${cacheFileName}.ejs`;
     let pageLoadedSuccess = false;
     if (!fs.existsSync(dataPath)) {
-        console.log(`Path: views/${dataPath} is not existed`);
+        console.log(`Path: ${dataPath} is not existed`);
        try {
            data = await myUtils.getData(link, cacheFileName);
            pageLoadedSuccess = true;
@@ -80,7 +129,7 @@ app.post("/ordered", (req, res) => {
     let hours = addZ(date.getHours());
     let dates = `${hours}h${min}m${sec}s${milS}ms`;
     jListMenu['Time'] = dates;
-    let linkId = link.slice(link.lastIndexOf("/") + 1);
+    let linkId = link.slice(link.lastIndexOf("/") + 1).replace(regrexAllSpecialCase, '-');
     let pathRoomFolder = `${dailyFolder}${roomId}-${linkId}/`
 
     // let orderNum = roomId;
@@ -129,10 +178,27 @@ app.get("/summary", (req, res) => {
     let min = addZ(date.getMinutes());
     let hours = addZ(date.getHours());
     let dates = `${hours}h${min}m${sec}s${milS}ms`;
-    let linkId = link.slice(link.lastIndexOf("/") + 1);
+    let linkId = link.slice(link.lastIndexOf("/") + 1).replace(regrexAllSpecialCase, '-');
     let pathRoomFolder = `${dailyFolder}${roomId}-${linkId}`; // folder path
 
     // READ DATA
+    let finalBill = new Map();
+    let listUserOrder = new Map();
+    let listDetailOrder = new Map();
+    finalBill.set('TotalPay', 0);
+
+    if (!fs.existsSync(pathRoomFolder)) {
+        console.log("No data!!!");
+        res.render("summary", {
+            roomId: roomId,
+            link: link,
+            yourBills: JSON.stringify(Object.fromEntries(finalBill)),
+            listUserOrder: JSON.stringify(Object.fromEntries(listUserOrder)),
+            listDetailOrder: JSON.stringify(Object.fromEntries(listDetailOrder))
+        });
+        return;
+    }
+
     const fileList = fs.readdirSync(pathRoomFolder);
     let files = [];
     console.log("Nums of file: ", fileList.length);
@@ -156,9 +222,6 @@ app.get("/summary", (req, res) => {
       }
     }
 
-    let finalBill = new Map();
-    let listUserOrder = new Map();
-    let listDetailOrder = new Map();
     for (const [i, v] of Object.entries(files)) {
         console.log(i, `:`);
         let order = JSON.parse(v);

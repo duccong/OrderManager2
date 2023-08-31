@@ -10,20 +10,45 @@
     Hello World
     <form id= "goShop" class="h5" method="POST" onsubmit="goShop()">
         Room ID: <br> <input type="text" name="fId" value="tai2.ho-VCB:0571000029741" style="width:50%"><br>
-        Yout Shopee link: <br> <input type="text" name="fLink" value="https://shopeefood.vn/da-nang/com-tam-an-11-bau-hat-6" style="width:50%"><br>
+        Yout Shopee link: <br> <input type="text" name="fLink" value="https://shopeefood.vn/da-nang/quan-com-425-com-ong-ich-khiem.3vxrmo?shareChannel=copy_link&smtt=0.0.9" style="width:50%"><br>
         <button type="submit" class="button button1">Go Shopping</button>
     </form>
+
+    <div> 
+        <table id="customers">
+            <tr> 
+                <th> ID </th>
+                <th> Shop is openning </th>
+        </tr>
+            <% for (const [k, v] of Object.entries(JSON.parse(data))) { %>
+            <tr onclick="goShopByLinkShpee('<%= v%>')"> 
+                <td> <%= k %> </td>
+                <td> <%= v %> </td>
+            </tr>
+            <% } %>
+        </table>
+    </div>
 
     <script>
         function goShop(){
             let user = document.getElementsByName("fId")[0].value;
             let link = document.getElementsByName("fLink")[0].value;
-            link = link.slice(link.indexOf('shopeefood.vn/') + 13);
-            user = user.replace(/\.|:/gi, "-");
-            var action_src = "/shopping?roomId=" + user + "&link=" +link;
-           var your_form = document.getElementById('goShop');
-           console.log('POST to ', action_src);
-           your_form.action = action_src ;
+            if (user.length < 1 || link.length < 1) {
+                alert('Please check your ID and link!!!');
+            } else {
+                const regrexAllSpecialCase = /[:;'"?!@#\$%\^\&*\)\(+=._-]/gi;
+                link = link.slice(link.indexOf('shopeefood.vn/') + 13);
+                user = user.replace(regrexAllSpecialCase, "-");
+                let action_src = "/shopping?roomId=" + user + "&link=" +link;
+                let your_form = document.getElementById('goShop');
+                console.log('POST to ', action_src);
+                your_form.action = action_src ;
+            }
+        }
+        function goShopByLinkShpee(sLink){
+           let action_src = `/shopping?linkShopee=${sLink}`;
+           console.log('GET from ', action_src);
+           location.href = action_src;
         }
     </script>
 </body>
